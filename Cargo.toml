@@ -1,0 +1,2 @@
+[workspace]
+members = ["Info_Keep_Lib", "Info_Keep_Clap", "Info_Keep_Iced"]
