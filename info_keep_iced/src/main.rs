@@ -1,4 +1,4 @@
-use Info_Keep_Lib::{export_db, import_db, new_entry, search_tag, sort_db, Tag};
+use info_keep_lib::{export_db, import_db, new_entry, search_tag, sort_db, Tag, Database};
 use chrono::prelude::*;
 
 use iced::{
@@ -164,7 +164,7 @@ impl std::fmt::Display for Options {
 }
 
 fn output_db() -> String {
-    let db = sled::open("Dates").unwrap();
+    let db = Database::open("Dates").unwrap();
     let (_, keys) = sort_db(db, false);
     let mut outputs: Vec<String> = Vec::new();
     for (k, v) in keys {
@@ -182,7 +182,7 @@ fn output_db() -> String {
 }
 
 fn run_command(mode: Options, data: Option<String>) -> String {
-    let open_db: sled::Db = sled::open("Dates").expect("Error opening Data base");
+    let open_db: Database::Db = Database::open("Dates").expect("Error opening Data base");
     let (db, _) = sort_db(open_db, false);
     let key = Utc::now().format("%Y-%m-%d+%H:%M:%S").to_string();
     let mut output = String::new();
@@ -203,11 +203,11 @@ fn run_command(mode: Options, data: Option<String>) -> String {
         Options::SearchDB => {
             let mid: Vec<String> = {
                 let tmp = data.unwrap();
-                tmp.split("+").map(|s| s.to_string()).collect()
+                tmp.split('+').map(|s| s.to_string()).collect()
             };
 
             let dates: Vec<String> = {
-                let tmp: Vec<&str> = mid.get(0).unwrap().split("-").collect();
+                let tmp: Vec<&str> = mid.get(0).unwrap().split('-').collect();
                 tmp.iter().map(|s| s.deref().deref().to_string()).collect()
             };
 

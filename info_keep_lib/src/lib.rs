@@ -1,8 +1,11 @@
-use sled::IVec;
 use std::collections::BinaryHeap;
 use std::io::{BufRead, Write};
 
-pub fn new_entry(db: sled::Db, key: &str, info: String) -> sled::Db {
+pub use sled as Database;
+
+
+
+pub fn new_entry(db: Database::Db, key: &str, info: String) -> Database::Db {
     db.insert(key.as_bytes(), info.as_bytes())
         .expect("Could not enter value");
     #[cfg(not(feature = "iced"))]
@@ -15,7 +18,7 @@ pub fn new_entry(db: sled::Db, key: &str, info: String) -> sled::Db {
     db
 }
 
-pub fn export_db(db: &sled::Db) {
+pub fn export_db(db: &Database::Db) {
     let mut file = match std::fs::File::create("ik_Export.txt") {
         Ok(file) => file,
         Err(_) => {
@@ -24,7 +27,7 @@ pub fn export_db(db: &sled::Db) {
         }
     };
     let (_, kvs) = sort_db(db.clone(), false);
-    file.write_all("sled_file\n".as_bytes())
+    file.write_all("info_keep_file\n".as_bytes())
         .expect("Could not write to export file");
     for (k, v) in kvs {
         let key = String::from_utf8_lossy(&*k);
@@ -34,12 +37,12 @@ pub fn export_db(db: &sled::Db) {
     }
 }
 
-pub fn import_db(db: sled::Db, import_file: Option<&Vec<(String, String)>>) -> sled::Db {
+pub fn import_db(db: Database::Db, import_file: Option<&Vec<(String, String)>>) -> Database::Db {
     let file: std::fs::File = if import_file.is_none() {
         std::fs::File::open("ik_Export.txt").expect("No such file exists")
     } else {
         let mut file = std::fs::File::create("ik_Export.txt").expect("Could not make data file");
-        file.write_all(b"sled_file\n")
+        file.write_all(b"Database_file\n")
             .expect("Could not write to import file");
         for (k, v) in import_file.unwrap() {
             let key = String::from_utf8_lossy(k.as_ref());
@@ -54,7 +57,7 @@ pub fn import_db(db: sled::Db, import_file: Option<&Vec<(String, String)>>) -> s
         .lines()
         .map(|l| l.expect("could not read file"))
         .collect();
-    if lines.contains(&"sled_file".to_string()) {
+    if lines.contains(&"info_keep_file".to_string()) {
         lines.remove(0);
         for key_value in lines {
             let mid_kv: Vec<&str> = key_value.split('=').collect();
@@ -180,7 +183,7 @@ impl Tag {
     }
 }
 
-pub fn search_tag(db: &sled::Db, tag: Tag) -> String {
+pub fn search_tag(db: &Database::Db, tag: Tag) -> String {
     let full_tag = tag.full_tag();
 
     if full_tag != "0000-01-01" {
@@ -218,7 +221,7 @@ pub fn search_tag(db: &sled::Db, tag: Tag) -> String {
     output
 }
 
-pub fn print_db(db: &sled::Db) {
+pub fn print_db(db: &Database::Db) {
     let (_, keys) = sort_db(db.clone(), false);
     for (k, v) in keys {
         println!(
@@ -229,7 +232,7 @@ pub fn print_db(db: &sled::Db) {
     }
 }
 
-pub fn sort_db(db: sled::Db, sort: bool) -> (sled::Db, Vec<(IVec, IVec)>) {
+pub fn sort_db(db: Database::Db, sort: bool) -> (Database::Db, Vec<(Database::IVec, Database::IVec)>) {
     use std::thread;
     let thread = thread::spawn(move || {
         let keys_iter = db.iter();
@@ -249,7 +252,7 @@ pub fn sort_db(db: sled::Db, sort: bool) -> (sled::Db, Vec<(IVec, IVec)>) {
             #[cfg(not(feature = "iced"))]
             println!("###Sorting Keys###");
 
-            db.clear().expect("Could not clear database of sorting");
+            db.clear().expect("Could not clear Database of sorting");
             for (k, v) in keys.clone() {
                 db.insert(k, v).expect("Could not enter value");
             }

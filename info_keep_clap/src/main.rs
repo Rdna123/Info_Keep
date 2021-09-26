@@ -1,5 +1,5 @@
 fn main() {
-    use Info_Keep_Lib::{export_db, import_db, new_entry, search_tag, sort_db, Tag};
+    use info_keep_lib::{export_db, import_db, new_entry, search_tag, sort_db, Tag, Database};
     use chrono::prelude::*;
     use clap::{crate_version, App, Arg, SubCommand};
     use read_input::InputBuild;
@@ -73,7 +73,7 @@ fn main() {
         )
         .get_matches();
 
-    let open_db: sled::Db = sled::open("Dates").expect("Error opening Data base");
+    let open_db: Database::Db = Database::open("Dates").expect("Error opening Data base");
 
     let sort = match matches.subcommand().0.is_empty() {
         true => {
@@ -126,11 +126,11 @@ fn main() {
     };
 
     #[cfg(not(debug_assertions))]
-    if matches.subcommand_matches("delete").is_some() {
-        if matches.is_present("KEY") {
+    if matches.subcommand_matches("delete").is_some() && matches.is_present("KEY"){
+
             db.remove(matches.value_of("KEY").unwrap().as_bytes())
                 .expect("Could not remove key");
-        }
+
     }
 
     #[cfg(debug_assertions)]

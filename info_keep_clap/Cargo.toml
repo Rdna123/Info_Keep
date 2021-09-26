@@ -1,12 +1,13 @@
 [package]
-name = "Info_Keep_Iced"
+name = "info_keep_clap"
 version = "0.1.0"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-iced = { version="0.3" }
-Info_Keep_Lib = {path = "../Info_Keep_Lib"}
+clap = {version = "2.33.3"}
+read_input = "0.8.4"
+info_keep_lib = {path = "../info_keep_lib" }
 chrono = "0.4.19"
 sled = { version = "0.34.6", features = ["compression"] }

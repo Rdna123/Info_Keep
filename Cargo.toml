@@ -1,2 +1,2 @@
 [workspace]
-members = ["Info_Keep_Lib", "Info_Keep_Clap", "Info_Keep_Iced"]
+members = ["info_keep_lib", "info_keep_clap", "info_keep_iced"]

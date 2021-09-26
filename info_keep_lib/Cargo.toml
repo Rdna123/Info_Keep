@@ -1,5 +1,5 @@
 [package]
-name = "Info_Keep_Lib"
+name = "info_keep_lib"
 version = "0.1.0"
 edition = "2018"
 
@@ -14,3 +14,7 @@ sled = { version = "0.34.6", features = ["compression"] }
 sled = "0.34.6"
 
 
+
+#m add no mangle to function and add unique names 
+# [lib]
+# crate-type = ["cdylib", "rlib"]
