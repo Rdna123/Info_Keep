@@ -102,7 +102,7 @@ fn main() {
 
     if let Some(matches) = matches.subcommand_matches("new") {
         let info = matches.value_of("INFO").unwrap();
-        db = new_entry(db, &key, info.to_string())
+        db = new_entry(db, &key, info)
     }
     if matches.subcommand_matches("search").is_some() {
         search_tag(&db, tag);

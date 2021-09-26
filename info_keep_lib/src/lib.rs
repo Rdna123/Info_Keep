@@ -1,11 +1,25 @@
+mod backends;
+pub mod backend_interface;
+
 use std::collections::BinaryHeap;
 use std::io::{BufRead, Write};
 
 pub use sled as Database;
 
+
+
 // TODO: Make Generic-Backends through an interface for different databases
 
-pub fn new_entry(db: Database::Db, key: &str, info: String) -> Database::Db {
+struct InfoKeep<B: backend_interface::BackendDatabase>{
+    database: B,
+}
+
+impl <B: backend_interface::BackendDatabase> InfoKeep<B>{
+    pub fn new_entry(self, key: &str, info: &str) -> {
+        self.database.insert(key.as_bytes(), info.as_bytes())
+    }
+}
+pub fn new_entry(db: Database::Db, key: &str, info: &str) -> Database::Db {
     db.insert(key.as_bytes(), info.as_bytes())
         .expect("Could not enter value");
     #[cfg(not(feature = "iced"))]
@@ -197,25 +211,24 @@ pub fn search_tag(db: &Database::Db, tag: Tag) -> String {
 
     let iter = db.range((full_tag.as_bytes())..);
 
-    let output = String::new();
+    let mut output = String::new();
 
     for i in iter.flatten() {
         let (k, v) = i;
-        #[cfg(not(feature = "iced"))]
-        println!(
-            "{} :: {}",
-            String::from_utf8_lossy(&*k),
-            String::from_utf8_lossy(&*v)
-        );
+        // #[cfg(not(feature = "iced"))]
+        // println!(
+        //     "{} :: {}",
+        //     String::from_utf8_lossy(&*k),
+        //     String::from_utf8_lossy(&*v)
+        // );
 
-        #[cfg(feature = "iced")]
-        {
+
             output += &*format!(
                 "{} :: {} \n",
                 String::from_utf8_lossy(&*k),
                 String::from_utf8_lossy(&*v)
             )
-        }
+
     }
 
     output
