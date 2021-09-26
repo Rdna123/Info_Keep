@@ -3,7 +3,7 @@ use std::io::{BufRead, Write};
 
 pub use sled as Database;
 
-
+// TODO: Make Generic-Backends through an interface for different databases
 
 pub fn new_entry(db: Database::Db, key: &str, info: String) -> Database::Db {
     db.insert(key.as_bytes(), info.as_bytes())
