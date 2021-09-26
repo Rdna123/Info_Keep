@@ -3,11 +3,11 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/Info_Keep_Clap/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Info_Keep_Iced/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Info_Keep_Lib/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/info_keep_clap/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/info_keep_iced/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/info_keep_lib/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
-      <excludeFolder url="file://$MODULE_DIR$/Info_Keep_Lib/target" />
+      <excludeFolder url="file://$MODULE_DIR$/info_keep_lib/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
