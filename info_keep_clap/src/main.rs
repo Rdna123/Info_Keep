@@ -1,7 +1,7 @@
 fn main() {
-    use info_keep_lib::{export_db, import_db, new_entry, search_tag, sort_db, Tag, Database};
     use chrono::prelude::*;
     use clap::{crate_version, App, Arg, SubCommand};
+    use info_keep_lib::{export_db, import_db, new_entry, search_tag, sort_db, Database, Tag};
     use read_input::InputBuild;
 
     let matches = App::new("Info Keep")
@@ -105,7 +105,7 @@ fn main() {
         db = new_entry(db, &key, info.to_string())
     }
     if matches.subcommand_matches("search").is_some() {
-        search_tag(&db, tag);
+        println!("{}", search_tag(&db, tag));
     }
 
     if matches.subcommand_matches("import").is_some() {
@@ -126,11 +126,9 @@ fn main() {
     };
 
     #[cfg(not(debug_assertions))]
-    if matches.subcommand_matches("delete").is_some() && matches.is_present("KEY"){
-
-            db.remove(matches.value_of("KEY").unwrap().as_bytes())
-                .expect("Could not remove key");
-
+    if matches.subcommand_matches("delete").is_some() && matches.is_present("KEY") {
+        db.remove(matches.value_of("KEY").unwrap().as_bytes())
+            .expect("Could not remove key");
     }
 
     #[cfg(debug_assertions)]

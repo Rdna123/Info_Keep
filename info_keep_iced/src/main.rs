@@ -1,5 +1,5 @@
-use info_keep_lib::{export_db, import_db, new_entry, search_tag, sort_db, Tag, Database};
 use chrono::prelude::*;
+use info_keep_lib::{export_db, import_db, new_entry, search_tag, sort_db, Database, Tag};
 
 use iced::{
     button, pick_list, scrollable, text_input, Align, Button, Container, Element, Length, PickList,
@@ -51,8 +51,7 @@ impl Sandbox for InfoKeep {
                     self.input_data.clone(),
                 );
                 self.input_data = Some(String::new());
-            }
-            // Message::Output => self.output = Some(output_db())
+            } // Message::Output => self.output = Some(output_db())
         }
     }
 
