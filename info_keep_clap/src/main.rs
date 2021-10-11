@@ -1,8 +1,10 @@
+use chrono::prelude::*;
+use clap::{crate_version, App, Arg, SubCommand};
+use info_keep_lib::{InfoKeep, Tag};
+use read_input::InputBuild;
+
 fn main() {
-    use chrono::prelude::*;
-    use clap::{crate_version, App, Arg, SubCommand};
-    use info_keep_lib::{export_db, import_db, new_entry, search_tag, sort_db, Database, Tag};
-    use read_input::InputBuild;
+
 
     let matches = App::new("Info Keep")
         .version(crate_version!())
@@ -57,7 +59,8 @@ fn main() {
                 .arg(
                     Arg::with_name("KEY")
                         .help("Key to delete info: 0000-00-00+00:00:00")
-                        .takes_value(true),
+                        .takes_value(true)
+                        .required(true),
                 ),
         )
         .subcommand(SubCommand::with_name("clear").about("Used to clear info keep"))
@@ -73,7 +76,7 @@ fn main() {
         )
         .get_matches();
 
-    let open_db: Database::Db = Database::open("Dates").expect("Error opening Data base");
+    let mut db: InfoKeep = InfoKeep::init("Dates");
 
     let sort = match matches.subcommand().0.is_empty() {
         true => {
@@ -83,7 +86,8 @@ fn main() {
         false => true,
     };
 
-    let (mut db, _) = sort_db(open_db, sort);
+    //let (mut db, _) = sort_db(open_db, sort);
+    db.sort_db(sort);
 
     let key: String;
     let tag: Tag;
@@ -100,20 +104,20 @@ fn main() {
     };
     // let key = String::from("Test");
 
-    if let Some(matches) = matches.subcommand_matches("new") {
-        let info = matches.value_of("INFO").unwrap();
-        db = new_entry(db, &key, info.to_string())
+    if let Some(m) = matches.subcommand_matches("new") {
+        let info = m.value_of("INFO").unwrap();
+        db.new_entry(&key, info);
     }
     if matches.subcommand_matches("search").is_some() {
-        println!("{}", search_tag(&db, tag));
+        println!("{}", db.search_tag(tag));
     }
 
     if matches.subcommand_matches("import").is_some() {
-        db = import_db(db, None);
+        db.import_db();
     }
 
     if matches.subcommand_matches("export").is_some() {
-        export_db(&db);
+        db.export_db();
     }
 
     if matches.subcommand_matches("clear").is_some() {
@@ -121,16 +125,17 @@ fn main() {
             .msg("Are you sure (true/False): ")
             .default(false);
         if input.get() {
-            db.clear().expect("Could not clear Info Keep data");
+            db.clear_db();
         }
     };
 
     #[cfg(not(debug_assertions))]
-    if matches.subcommand_matches("delete").is_some() && matches.is_present("KEY") {
-        db.remove(matches.value_of("KEY").unwrap().as_bytes())
-            .expect("Could not remove key");
+    if let Some(m) = matches.subcommand_matches("delete"){
+        println!("Removed info from {}", m.value_of("KEY").unwrap());
+        db.remove_info(m.value_of("KEY").unwrap());
     }
 
+
     #[cfg(debug_assertions)]
-    db.remove(key.as_bytes()).expect("Key does not exist");
+    db.remove_info(&key);
 }

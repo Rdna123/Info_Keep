@@ -1,5 +1,5 @@
 use chrono::prelude::*;
-use info_keep_lib::{export_db, import_db, new_entry, search_tag, sort_db, Database, Tag};
+use info_keep_lib::{InfoKeep,Tag};
 
 use iced::{
     button, pick_list, scrollable, text_input, Align, Button, Container, Element, Length, PickList,
@@ -8,11 +8,11 @@ use iced::{
 use std::ops::Deref;
 
 pub fn main() {
-    InfoKeep::run(Settings::default()).expect("Could not open GUI");
+    InfoKeepIced::run(Settings::default()).expect("Could not open GUI");
 }
 
 #[derive(Default)]
-struct InfoKeep {
+struct InfoKeepIced {
     scroll: scrollable::State,
     text_box: text_input::State,
     mode_section: pick_list::State<Options>,
@@ -30,7 +30,7 @@ enum Message {
     // Output
 }
 
-impl Sandbox for InfoKeep {
+impl Sandbox for InfoKeepIced {
     type Message = Message;
 
     fn new() -> Self {
@@ -80,7 +80,7 @@ impl Sandbox for InfoKeep {
                 if self.selected_mode != Some(Options::SearchDB) {
                     text.to_string()
                 } else {
-                    run_command(Options::SearchDB, self.input_data.clone())
+                    run_command(Options::SearchDB, self.input_data.clone()) +"\n"+ &output_db()
                 }
             }
         };
@@ -163,8 +163,8 @@ impl std::fmt::Display for Options {
 }
 
 fn output_db() -> String {
-    let db = Database::open("Dates").unwrap();
-    let (_, keys) = sort_db(db, false);
+    let mut db = InfoKeep::init("Dates");
+    let keys = db.sort_db(false);
     let mut outputs: Vec<String> = Vec::new();
     for (k, v) in keys {
         outputs.push(format!(
@@ -181,23 +181,22 @@ fn output_db() -> String {
 }
 
 fn run_command(mode: Options, data: Option<String>) -> String {
-    let open_db: Database::Db = Database::open("Dates").expect("Error opening Data base");
-    let (db, _) = sort_db(open_db, false);
+    let mut db: InfoKeep = InfoKeep::init("Dates");
+    db.sort_db(false);
     let key = Utc::now().format("%Y-%m-%d+%H:%M:%S").to_string();
-    let mut output = String::new();
+    let mut output: String = "".to_string();
     match mode {
         Options::NewEntry => {
-            new_entry(db, &key, data.unwrap());
+           output = db.new_entry( &key, &data.unwrap());
         }
         Options::ExportDB => {
-            export_db(&db);
+            db.export_db();
         }
         Options::ImportDB => {
-            import_db(db, None);
+            db.import_db();
         }
         Options::DeleteEntry => {
-            db.remove(data.unwrap().as_bytes())
-                .expect("Could not remove key");
+            db.remove_info(&data.unwrap());
         }
         Options::SearchDB => {
             let mid: Vec<String> = {
@@ -215,7 +214,7 @@ fn run_command(mode: Options, data: Option<String>) -> String {
                 dates.get(1).map(|s| s.as_str()),
                 dates.get(2).map(|s| s.as_str()),
             );
-            output = search_tag(&db, tag);
+            output = db.search_tag( tag);
         }
     }
     output

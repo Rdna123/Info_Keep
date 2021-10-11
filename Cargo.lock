@@ -1292,18 +1292,17 @@ dependencies = [
 
 [[package]]
 name = "info_keep_clap"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "chrono",
  "clap",
  "info_keep_lib",
  "read_input",
- "sled",
 ]
 
 [[package]]
 name = "info_keep_iced"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "chrono",
  "iced",
