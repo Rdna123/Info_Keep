@@ -1,11 +1,8 @@
-use chrono::prelude::*;
 use clap::{crate_version, App, Arg, SubCommand};
-use info_keep_lib::{InfoKeep, Tag};
+use info_keep_lib::{InfoKeep, Tag, Time};
 use read_input::InputBuild;
 
 fn main() {
-
-
     let matches = App::new("Info Keep")
         .version(crate_version!())
         .author("Robert Kimura <chknmanrob1904@gmail.com>")
@@ -48,7 +45,7 @@ fn main() {
         )
         .subcommand(
             SubCommand::with_name("search")
-                .about("Search kept info, not options for full listing")
+                .about("Search kept info, use no Tag args for full listing")
                 .help("Searches info kept: info_keep.exe [OPTIONS] search")
                 .alias("s"),
         )
@@ -95,12 +92,12 @@ fn main() {
         let year = matches.value_of("year");
         let month = matches.value_of("month");
         let day = matches.value_of("Day");
-        let time = Utc::now().format("+%H:%M:%S").to_string();
+        let time = Time::generate_time();
         tag = Tag::new(year, month, day);
         key = Tag::new(year, month, day).full_tag() + &*time;
     } else {
         tag = Tag::new(None, None, None);
-        key = Utc::now().format("%Y-%m-%d+%H:%M:%S").to_string();
+        key = Time::generate_timestamp();
     };
     // let key = String::from("Test");
 
@@ -130,11 +127,10 @@ fn main() {
     };
 
     #[cfg(not(debug_assertions))]
-    if let Some(m) = matches.subcommand_matches("delete"){
+    if let Some(m) = matches.subcommand_matches("delete") {
         println!("Removed info from {}", m.value_of("KEY").unwrap());
         db.remove_info(m.value_of("KEY").unwrap());
     }
-
 
     #[cfg(debug_assertions)]
     db.remove_info(&key);

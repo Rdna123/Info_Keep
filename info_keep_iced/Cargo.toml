@@ -10,3 +10,7 @@ edition = "2018"
 iced = { version="0.3" }
 info_keep_lib = {path = "../info_keep_lib" }
 chrono = "0.4.19"
+
+# Secuity Patch
+[patch.crates-io]
+chrono = { git = "https://github.com/timvisee/chrono", branch = "time-0.3" }

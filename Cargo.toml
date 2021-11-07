@@ -1,2 +1,7 @@
 [workspace]
-members = ["info_keep_lib", "info_keep_clap", "info_keep_iced"]
+members = [
+    "info_keep_lib",
+    "info_keep_clap",
+#    Deprecrated
+#    "info_keep_iced"
+]

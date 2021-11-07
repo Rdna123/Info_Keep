@@ -1,5 +1,6 @@
 use std::collections::BinaryHeap;
 use std::io::{BufRead, Write};
+use time::{Month};
 
 const BEGINNING_DATE: &str = "0000-01-01";
 
@@ -15,9 +16,7 @@ impl InfoKeep {
     }
 
     pub fn new_entry(&mut self, key: &str, info: &str) -> String {
-        self.db
-            .insert(key, info)
-            .expect("Could not enter value");
+        self.db.insert(key, info).expect("Could not enter value");
         let mid = self.db.get(key.as_bytes()).unwrap().unwrap();
         let result = String::from_utf8_lossy(&*mid);
         format!("\nInfo added for {}\n{}\n\n", key, result)
@@ -114,7 +113,7 @@ impl InfoKeep {
             output = format!("Searching for entries with tag: {}\n", full_tag);
         } else {
             output = self.print_db();
-            return  "Listing all entries\n".to_owned() + &output;
+            return "Listing all entries\n".to_owned() + &output;
         };
 
         let iter: sled::Iter = self.db.range((full_tag.as_bytes())..);
@@ -132,11 +131,11 @@ impl InfoKeep {
         output
     }
 
-    pub fn remove_info(&mut self, key: &str){
+    pub fn remove_info(&mut self, key: &str) {
         self.db.remove(key).expect("Could not remove key");
     }
 
-    pub fn clear_db(&mut self){
+    pub fn clear_db(&mut self) {
         self.db.clear().expect("Could not clear Info Keep data");
     }
 }
@@ -157,39 +156,26 @@ impl Tag {
             day: day.map(|v| v.to_string()),
         }
     }
-    pub fn full_tag(self) -> String {
+
+    pub fn full_tag(&self) -> String {
         let mut year = "0000".to_string();
         if self.year.is_some() {
-            year = self.year.unwrap();
+            year = self.year.clone().unwrap();
         }
 
         let mut month = "01".to_string();
         if self.month.is_some() {
-            month = self.month.unwrap();
+            month = self.month.clone().unwrap();
         }
 
-        let mut day = "01".to_string();
+        let mut day = "1".to_string();
         if self.day.is_some() {
-            day = self.day.unwrap();
+            day = self.day.clone().unwrap();
         }
 
         if year.len() < 4 || year.len() > 4 {
-            println!("year should have 4 digits\nFixing\n");
-            let mut total_vec = Vec::new();
-            for i in year.chars() {
-                total_vec.push(i)
-            }
-
-            if total_vec.len() < 4 {
-                let mut total = "2".to_string();
-                for t in total_vec.into_iter() {
-                    total += &*char::to_string(&t);
-                }
-                year = total
-            } else {
-                println!("Defaulting to 0000");
-                year = "0000".to_string()
-            }
+            println!("Defaulting to 0000");
+            year = "0000".to_string()
         }
 
         if month.len() < 2 || month.len() > 2 {
@@ -200,38 +186,85 @@ impl Tag {
             }
 
             if total_vec.len() < 4 {
-                let mut total = "2".to_string();
-                for t in total_vec.into_iter() {
-                    total += &*char::to_string(&t);
-                }
-                month = total
-            } else {
                 println!("Defaulting to 01");
                 month = "01".to_string()
             }
         }
 
         if day.len() < 2 || day.len() > 2 {
-            println!("Day should have 2 digits\nFixing\n");
             let mut total_vec = Vec::new();
             for i in day.chars() {
                 total_vec.push(i)
             }
 
-            if total_vec.len() < 4 {
-                let mut total = "2".to_string();
+            if total_vec.len() < 2 {
+                let mut total = "0".to_string();
                 for t in total_vec.into_iter() {
                     total += &*char::to_string(&t);
                 }
                 day = total
             } else {
-                println!("Defaulting to 00 for day\n");
-                day = "01".to_string()
+                println!("Defaulting to 1 for day\n");
+                day = "1".to_string()
             }
         }
 
         let full_tag: String = year + "-" + &*month + "-" + &*day;
 
         full_tag
+    }
+}
+
+pub struct Time;
+
+impl Time {
+    pub fn generate_time() -> String {
+        use std::time::SystemTime;
+        let datetime = time::OffsetDateTime::from(SystemTime::now());
+
+        let time_temp = &datetime.time().as_hms();
+
+        let time = |x: u8| match x {
+            0 => time_temp.0.to_string(),
+            1 => time_temp.1.to_string(),
+            2 => {
+                if time_temp.2 < 10 {
+                    return String::from("0a") + &time_temp.2.to_string();
+                } else {
+                    time_temp.2.to_string()
+                }
+            }
+            _ => {
+                panic!("Outbounds on Generating timestamp")
+            }
+        };
+
+        let time = format!("{}:{}:{}", &time(0), &time(1), time(2));
+        return time;
+    }
+
+    pub fn generate_date() -> String {
+        use std::time::SystemTime;
+        let datetime = time::OffsetDateTime::from(SystemTime::now());
+        let month = match &datetime.month() {
+            Month::January => 1,
+            Month::February => 2,
+            Month::March => 3,
+            Month::April => 4,
+            Month::May => 5,
+            Month::June => 6,
+            Month::July => 7,
+            Month::August => 8,
+            Month::September => 9,
+            Month::October => 10,
+            Month::November => 11,
+            Month::December => 12,
+        };
+        let date = format!("{}-{}-{}", &datetime.year(), month, &datetime.day());
+        return date;
+    }
+
+    pub fn generate_timestamp() -> String {
+        return Time::generate_date() + "+" + &Time::generate_time();
     }
 }
