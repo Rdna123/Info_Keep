@@ -5,3 +5,4 @@ members = [
 #    Deprecrated
 #    "info_keep_iced"
 ]
+exclude = ["info_keep_iced"]
