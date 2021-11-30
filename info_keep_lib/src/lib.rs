@@ -1,3 +1,5 @@
+pub mod database;
+
 use std::collections::BinaryHeap;
 use std::io::{BufRead, Write};
 use time::{Month};
@@ -8,21 +10,23 @@ pub struct InfoKeep {
     db: sled::Db,
 }
 
-impl InfoKeep {
-    pub fn init(path: &str) -> Self {
+impl database::Database for InfoKeep {
+    type DBUnit = sled::IVec;
+
+    fn init(path: &str) -> Self {
         Self {
             db: sled::open(path).unwrap(),
         }
     }
 
-    pub fn new_entry(&mut self, key: &str, info: &str) -> String {
+    fn new_entry(&mut self, key: &str, info: &str) -> String {
         self.db.insert(key, info).expect("Could not enter value");
         let mid = self.db.get(key.as_bytes()).unwrap().unwrap();
         let result = String::from_utf8_lossy(&*mid);
         format!("\nInfo added for {}\n{}\n\n", key, result)
     }
 
-    pub fn sort_db(&mut self, sort: bool) -> Vec<(sled::IVec, sled::IVec)> {
+    fn sort_db(&mut self, sort: bool) -> Vec<(sled::IVec, sled::IVec)> {
         let keys_iter = self.db.iter();
         let mut bh_keys = BinaryHeap::new();
 
@@ -45,7 +49,7 @@ impl InfoKeep {
         keys
     }
 
-    pub fn export_db(&mut self) {
+    fn export_db(&mut self) {
         let mut file = match std::fs::File::create("ik_Export.text") {
             Ok(file) => file,
             Err(_) => {
@@ -66,7 +70,7 @@ impl InfoKeep {
         }
     }
 
-    pub fn import_db(&mut self) {
+    fn import_db(&mut self) {
         let file: std::fs::File = std::fs::File::open("ik_Export.txt")
             .expect("No such file called 'ik_Export.txt' found");
         let buf = std::io::BufReader::new(file);
@@ -91,7 +95,7 @@ impl InfoKeep {
         self.print_db();
     }
 
-    pub fn print_db(&self) -> String {
+    fn print_db(&self) -> String {
         let keys = self.db.iter();
         let mut output = String::new();
         for (k, v) in keys.flatten() {
@@ -104,7 +108,7 @@ impl InfoKeep {
         output
     }
 
-    pub fn search_tag(&self, tag: Tag) -> String {
+    fn search_tag(&self, tag: Tag) -> String {
         let full_tag = tag.full_tag();
 
         let mut output: String;
@@ -131,11 +135,11 @@ impl InfoKeep {
         output
     }
 
-    pub fn remove_info(&mut self, key: &str) {
+    fn remove_info(&mut self, key: &str) {
         self.db.remove(key).expect("Could not remove key");
     }
 
-    pub fn clear_db(&mut self) {
+    fn clear_db(&mut self) {
         self.db.clear().expect("Could not clear Info Keep data");
     }
 }
