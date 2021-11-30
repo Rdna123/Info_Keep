@@ -1,9 +1,10 @@
 use clap::{crate_version, App, Arg, SubCommand};
 use info_keep_lib::{InfoKeep, Tag, Time};
 use read_input::InputBuild;
+use info_keep_lib::database::Database;
 
 fn main() {
-    let matches = App::new("Info Keep")
+    let matches = App::new("InfoKeep Clap")
         .version(crate_version!())
         .author("Robert Kimura <chknmanrob1904@gmail.com>")
         .about("Stores information you want to keep using date-time format")
@@ -30,6 +31,13 @@ fn main() {
                 .takes_value(true)
                 .help("Day for new entry or search")
                 .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("Version")
+                .short("v")
+                .long("version")
+                .takes_value(false)
+                .help("prints version")
         )
         .subcommand(
             SubCommand::with_name("new")
@@ -73,15 +81,22 @@ fn main() {
         )
         .get_matches();
 
-    let mut db: InfoKeep = InfoKeep::init("Dates");
+    if matches.is_present("Version"){
+        println!("InfoKeep Clap Version: {}", crate_version!());
+        println!("{}", InfoKeep::version());
+        return;
+    }
 
     let sort = match matches.subcommand().0.is_empty() {
         true => {
             println!("{}", matches.usage());
-            false
+            return;
         }
         false => true,
     };
+
+    let mut db: InfoKeep = InfoKeep::init("Dates");
+
 
     //let (mut db, _) = sort_db(open_db, sort);
     db.sort_db(sort);
