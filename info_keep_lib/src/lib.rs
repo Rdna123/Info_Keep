@@ -233,7 +233,7 @@ impl Time {
             1 => time_temp.1.to_string(),
             2 => {
                 if time_temp.2 < 10 {
-                    return String::from("0a") + &time_temp.2.to_string();
+                    String::from("0a") + &time_temp.2.to_string()
                 } else {
                     time_temp.2.to_string()
                 }
@@ -244,7 +244,7 @@ impl Time {
         };
 
         let time = format!("{}:{}:{}", &time(0), &time(1), time(2));
-        return time;
+        time
     }
 
     pub fn generate_date() -> String {
@@ -265,10 +265,10 @@ impl Time {
             Month::December => 12,
         };
         let date = format!("{}-{}-{}", &datetime.year(), month, &datetime.day());
-        return date;
+        date
     }
 
     pub fn generate_timestamp() -> String {
-        return Time::generate_date() + "+" + &Time::generate_time();
+        Time::generate_date() + "+" + &Time::generate_time()
     }
 }

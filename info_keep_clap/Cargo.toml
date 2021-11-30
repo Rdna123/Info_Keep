@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 clap = {version = "2.33.3"}
-read_input = "0.8.4"
+read_input = "0.8.6"
 info_keep_lib = {path = "../info_keep_lib" }
 
 

@@ -1,6 +1,6 @@
 use crate::Tag;
 
-const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub trait Database{
     type DBUnit;
